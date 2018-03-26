@@ -94,7 +94,8 @@ def containerBuildPub(Map args) {
 
     println "Running Docker build/publish: ${args.host}/${args.acct}/${args.repo}:${args.tags}"
 
-    docker.withRegistry("https://${args.host}", "${args.auth_id}") {
+    // updated for aws ecr plugin
+    docker.withRegistry("https://${args.host}", "ecr:us-east-1:${args.auth_id}") {
 
         // def img = docker.build("${args.acct}/${args.repo}", args.dockerfile)
         def img = docker.image("${args.acct}/${args.repo}")
