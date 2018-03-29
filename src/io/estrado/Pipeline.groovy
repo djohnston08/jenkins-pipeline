@@ -4,8 +4,7 @@ package io.estrado;
 def kubectlTest() {
     // Test that kubectl can correctly communication with the Kubernetes API
     println "checking kubectl connnectivity to the API"
-    sh "kubectl get nodes"
-
+    sh "kubectl get po"
 }
 
 def helmLint(String chart_dir) {
