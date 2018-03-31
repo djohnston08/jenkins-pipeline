@@ -102,8 +102,13 @@ def updateAndDeploy(String org, String project, String tag) {
     println "Deployment updated"
 }
 
-def updateGitRepo(args, String app, String tag) {
-    println "Updating git repo: ${args.git_repo.repo}"
+def updateGitRepo(Map args) {
+    println "Updating git repo: ${args.repo}"
+    println "Updating git creds id: ${args.creds}"
+    println "Updating git name: ${args.name}"
+    println "Updating git email: ${args.email}"
+    println "app: ${args.app}"
+    println "tag: ${args.tag}"
     try {
         withCredentials([usernamePassword(credentialsId: args.git_repo.get_creds_id, usernameVariable: 'user', passwordVariable: 'pass')]) {
             container('git') {
@@ -116,14 +121,13 @@ def updateGitRepo(args, String app, String tag) {
                 git checkout master
                 git stash apply
                 git add .
-                git commit -m 'Updated ${app} deployment to use ${tag}'
+                git commit -m 'Updated ${args.app} deployment to use ${args.tag}'
                 git push origin master
                 """
             }
         }
     } catch (Exception e) {
         println "No changes to git repo: ${e}"
-        println "${e.printStackTrace()}"
     }
 }
 
