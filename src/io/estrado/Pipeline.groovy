@@ -102,15 +102,15 @@ def updateAndDeploy(String org, String project, String tag) {
     println "Deployment updated"
 }
 
-def updateGitRepo(String creds, String app, String tag) {
+def updateGitRepo(Map args, String app, String tag) {
     try {
-        withCredentials([usernamePassword(credentialsId: creds, usernameVariable: 'user', passwordVariable: 'pass')]) {
+        withCredentials([usernamePassword(credentialsId: args.git_repo.get_creds_id, usernameVariable: 'user', passwordVariable: 'pass')]) {
             container('git') {
                 sh """
                 cd \$WORKSPACE
-                git remote set-url origin https://$user:$pass@github.com/legfi/service-deployments
-                git config user.email "legfi-code@legfi.com"
-                git config user.name "code@legfi"
+                git remote set-url origin https://$user:$pass@github.com/${args.git_repo.repo}
+                git config user.email "${args.git_repo.email}"
+                git config user.name "${args.git_repo.name}"
                 git stash save
                 git checkout master
                 git stash apply
