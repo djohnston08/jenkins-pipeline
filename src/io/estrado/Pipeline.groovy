@@ -103,21 +103,25 @@ def updateAndDeploy(String org, String project, String tag) {
 }
 
 def updateGitRepo(String creds, String app, String tag) {
-    withCredentials([usernamePassword(credentialsId: creds, usernameVariable: 'user', passwordVariable: 'pass')]) {
-        container('git') {
-            sh """
-            cd \$WORKSPACE
-            git remote set-url origin https://$user:$pass@github.com/legfi/service-deployments
-            git config user.email "legfi-code@legfi.com"
-            git config user.name "code@legfi"
-            git stash save
-            git checkout master
-            git stash apply
-            git add .
-            git commit -m 'Updated ${app} deployment to use ${tag}'
-            git push origin master
-            """
+    try {
+        withCredentials([usernamePassword(credentialsId: creds, usernameVariable: 'user', passwordVariable: 'pass')]) {
+            container('git') {
+                sh """
+                cd \$WORKSPACE
+                git remote set-url origin https://$user:$pass@github.com/legfi/service-deployments
+                git config user.email "legfi-code@legfi.com"
+                git config user.name "code@legfi"
+                git stash save
+                git checkout master
+                git stash apply
+                git add .
+                git commit -m 'Updated ${app} deployment to use ${tag}'
+                git push origin master
+                """
+            }
         }
+    } catch (Exception e) {
+        println "No changes to git repo"
     }
 }
 
