@@ -103,20 +103,14 @@ def updateAndDeploy(String org, String project, String tag) {
 }
 
 def updateGitRepo(Map args) {
-    println "Updating git repo: ${args.repo}"
-    println "Updating git creds id: ${args.creds}"
-    println "Updating git name: ${args.name}"
-    println "Updating git email: ${args.email}"
-    println "app: ${args.app}"
-    println "tag: ${args.tag}"
     try {
-        withCredentials([usernamePassword(credentialsId: args.git_repo.get_creds_id, usernameVariable: 'user', passwordVariable: 'pass')]) {
+        withCredentials([usernamePassword(credentialsId: args.creds, usernameVariable: 'user', passwordVariable: 'pass')]) {
             container('git') {
                 sh """
                 cd \$WORKSPACE
-                git remote set-url origin https://$user:$pass@github.com/${args.git_repo.repo}
-                git config user.email "${args.git_repo.email}"
-                git config user.name "${args.git_repo.name}"
+                git remote set-url origin https://$user:$pass@github.com/${args.repo}
+                git config user.email "${args.email}"
+                git config user.name "${args.name}"
                 git stash save
                 git checkout master
                 git stash apply
