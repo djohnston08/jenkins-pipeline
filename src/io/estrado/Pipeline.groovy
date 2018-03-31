@@ -88,6 +88,38 @@ def gitEnvVars() {
     println "env.GIT_REMOTE_URL ==> ${env.GIT_REMOTE_URL}"
 }
 
+def updateAndDeploy(String org, String project, String tag) {
+    println "Updating deployment yaml and deploying to cluster"
+
+    def workingDir = env.WORKSPACE + '/' + project
+    def pattern = '\\(.*amazonaws\\.com\\/' + org + '\\/' + project + '\\:\\).*'
+    sh """
+    cd ${workingDir}
+    sed -i 's/^${pattern}\$/\\1${tag}/' ./deployment.yaml
+    kubectl apply -f deployment.yaml
+    """
+
+    println "Deployment updated"
+}
+
+def updateGitRepo(String creds, String app, String tag) {
+    withCredentials([usernamePassword(credentialsId: creds, usernameVariable: 'user', passwordVariable: 'pass')]) {
+        container('git') {
+            sh """
+            cd \$WORKSPACE
+            git remote set-url origin https://$user:$pass@github.com/legfi/service-deployments
+            git config user.email "legfi-code@legfi.com"
+            git config user.name "code@legfi"
+            git stash save
+            git checkout master
+            git stash apply
+            git add .
+            git commit -m 'Updated ${app} deployment to use ${tag}'
+            git push origin master
+            """
+        }
+    }
+}
 
 def containerBuildPub(Map args) {
 
