@@ -102,7 +102,7 @@ def updateAndDeploy(String org, String project, String tag) {
     println "Deployment updated"
 }
 
-def updateGitRepo(Map args, String app, String tag) {
+def updateGitRepo(args, String app, String tag) {
     println "Updating git repo: ${args.git_repo.repo}"
     try {
         withCredentials([usernamePassword(credentialsId: args.git_repo.get_creds_id, usernameVariable: 'user', passwordVariable: 'pass')]) {
@@ -123,6 +123,7 @@ def updateGitRepo(Map args, String app, String tag) {
         }
     } catch (Exception e) {
         println "No changes to git repo: ${e}"
+        println "${e.printStackTrace()}"
     }
 }
 
